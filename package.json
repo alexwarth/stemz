@@ -12,7 +12,7 @@
     "prepublishOnly": "npm run tsc"
   },
   "keywords": [],
-  "author": "",
+  "author": "Alex Warth <alexwarth@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "@types/audioworklet": "^0.0.52",
