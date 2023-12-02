@@ -1,0 +1,21 @@
+{
+  "name": "stems",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./lib/index.js",
+  "module": "./lib/index.js",
+  "files": [
+    "lib/"
+  ],
+  "scripts": {
+    "tsc": "tsc -p tsconfig.json",
+    "prepublishOnly": "npm run tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/audioworklet": "^0.0.52",
+    "typescript": "^5.3.2"
+  }
+}
