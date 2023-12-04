@@ -1,3 +1,6 @@
+// TODO: fix or remove oscillator sync code
+// (I accidentally added it before it was ready)
+
 const { abs, max, min, random, round, sin, tan, PI } = Math;
 const TAU = 2 * PI;
 
@@ -74,6 +77,16 @@ export abstract class Stem {
 // #endregion interface
 
 // #region sources
+
+class State extends Stem {
+  constructor(public value: number) {
+    super();
+  }
+
+  valueAt(_t: number) {
+    return this.value;
+  }
+}
 
 class Ref extends Stem {
   constructor(public source: Stem) {
@@ -488,6 +501,10 @@ function asStem(x: number | Stem): Stem {
 // #endregion operators
 
 // #region exports
+
+export function state(initialValue = 0) {
+  return new State(initialValue);
+}
 
 export function constant(value: number) {
   return new Constant(value);
