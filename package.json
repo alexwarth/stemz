@@ -1,11 +1,11 @@
 {
   "name": "stemz",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "",
-  "main": "./lib/index.js",
-  "module": "./lib/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "files": [
-    "lib/"
+    "dist/"
   ],
   "scripts": {
     "tsc": "tsc -p tsconfig.json",
