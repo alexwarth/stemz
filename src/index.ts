@@ -1,6 +1,3 @@
-// TODO: fix or remove oscillator sync code
-// (I accidentally added it before it was ready)
-
 const { abs, max, min, random, round, sin, tan, PI } = Math;
 const TAU = 2 * PI;
 
@@ -123,7 +120,6 @@ abstract class Osc extends Stem {
   constructor(
     public readonly freq: Stem,
     private readonly phaseToValue: (phase: number) => number,
-    public readonly sync?: Osc
   ) {
     super();
   }
@@ -131,37 +127,30 @@ abstract class Osc extends Stem {
   valueAt(t: number) {
     const freq = this.freq.valueAt(t);
     this.phase += (TAU * freq) / sampleRate;
-    if (this.sync) {
-      this.sync.valueAt(t); // advance phase
-      if (this.sync.phase % TAU <= 0.001) {
-        console.log('boom');
-        this.phase = 0;
-      }
-    }
     return this.phaseToValue(this.phase);
   }
 }
 
 class Sine extends Osc {
-  constructor(freq: Stem, sync?: Osc) {
-    super(freq, sin, sync);
+  constructor(freq: Stem) {
+    super(freq, sin);
   }
 }
 
 class Square extends Osc {
-  constructor(freq: Stem, sync?: Osc) {
-    super(freq, phase => (sin(phase) > 0 ? 1 : -1), sync);
+  constructor(freq: Stem) {
+    super(freq, phase => (sin(phase) > 0 ? 1 : -1));
   }
 }
 
 class Sawtooth extends Osc {
-  constructor(freq: Stem, sync?: Osc) {
-    super(freq, phase => ((phase / TAU) % 1) * 2 - 1, sync);
+  constructor(freq: Stem) {
+    super(freq, phase => ((phase / TAU) % 1) * 2 - 1);
   }
 }
 
 class SineN extends Osc {
-  constructor(freq: Stem, overtoneCount: number, sync?: Osc) {
+  constructor(freq: Stem, overtoneCount: number) {
     super(
       freq,
       phase => {
@@ -170,8 +159,7 @@ class SineN extends Osc {
           ans += sin(i * phase) / overtoneCount;
         }
         return ans;
-      },
-      sync
+      }
     );
   }
 }
@@ -516,20 +504,20 @@ export const whiteNoise = new WhiteNoise();
 
 export const pinkNoise = new PinkNoise();
 
-export function sine(freq: number | Stem, sync?: Osc) {
-  return new Sine(asStem(freq), sync);
+export function sine(freq: number | Stem) {
+  return new Sine(asStem(freq));
 }
 
-export function square(freq: number | Stem, sync?: Osc) {
-  return new Square(asStem(freq), sync);
+export function square(freq: number | Stem) {
+  return new Square(asStem(freq));
 }
 
-export function sawtooth(freq: number | Stem, sync?: Osc) {
-  return new Sawtooth(asStem(freq), sync);
+export function sawtooth(freq: number | Stem) {
+  return new Sawtooth(asStem(freq));
 }
 
-export function sinen(freq: number | Stem, overtoneCount: number, sync?: Osc) {
-  return new SineN(asStem(freq), overtoneCount, sync);
+export function sinen(freq: number | Stem, overtoneCount: number) {
+  return new SineN(asStem(freq), overtoneCount);
 }
 
 export function ramp(args: {
