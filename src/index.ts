@@ -520,6 +520,54 @@ export function sinen(freq: number | Stem, overtoneCount: number) {
   return new SineN(asStem(freq), overtoneCount);
 }
 
+class WaveTableOsc extends Osc {
+  constructor(freq: Stem, waveTable: number[], freqMultiplier: Stem) {
+    super(freq.mul(freqMultiplier), phase => {
+      const fracIdx = ((phase % TAU) / TAU) * waveTable.length;
+      const idx1 = Math.floor(fracIdx);
+      const idx2 = (idx1 + 1) % waveTable.length;
+      const amt2 = fracIdx - idx1;
+      const amt1 = 1 - amt2;
+      return amt1 * waveTable[idx1] + amt2 * waveTable[idx2];
+    });
+  }
+}
+
+function makeWaveTable(fn: (phase: number) => number, size: number) {
+  const waveTable = new Array(size);
+  for (let idx = 0; idx < size; idx++) {
+    const phase = (idx / size) * TAU;
+    waveTable[idx] = fn(phase);
+  }
+  return waveTable;
+}
+
+const waveTables = {
+  sine: makeWaveTable(Math.sin, 1024),
+  square: makeWaveTable(phase => (Math.sin(phase) >= 0 ? 1 : -1), 1024),
+  sawtooth: makeWaveTable(phase => (2 * phase) / TAU - 1, 1024),
+};
+
+export function wavetable(
+  freq: number | Stem,
+  wt: number[],
+  freqMultiplier: number | Stem = 1
+) {
+  return new WaveTableOsc(asStem(freq), wt, asStem(freqMultiplier));
+}
+
+export function wtSine(freq: number | Stem) {
+  return wavetable(freq, waveTables.sine);
+}
+
+export function wtSquare(freq: number | Stem) {
+  return wavetable(freq, waveTables.square);
+}
+
+export function wtSawtooth(freq: number | Stem) {
+  return wavetable(freq, waveTables.sawtooth);
+}
+
 export function ramp(args: {
   time: number;
   initialValue?: number;
