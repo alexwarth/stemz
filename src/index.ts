@@ -30,6 +30,10 @@ export abstract class Stem {
     return mul(this, ...args.map(asStem));
   }
 
+  div(divisor: number | Stem) {
+    return div(this, divisor);
+  }
+
   lpf(cutoffFreq: number | Stem, q: number | Stem = 0.707) {
     return new BiquadFilter('lp', this, asStem(cutoffFreq), asStem(q));
   }
@@ -378,6 +382,19 @@ class Mul extends Stem {
   }
 }
 
+class Div extends Stem {
+  constructor(
+    public readonly dividend: Stem,
+    public readonly divisor: Stem
+  ) {
+    super();
+  }
+
+  valueAt(t: number) {
+    return this.dividend.valueAt(t) / this.divisor.valueAt(t);
+  }
+}
+
 // based on https://www.earlevel.com/main/2012/11/26/biquad-c-source-code/
 class BiquadFilter extends Stem {
   private z1 = 0;
@@ -521,15 +538,18 @@ export function sinen(freq: number | Stem, overtoneCount: number) {
 }
 
 class WaveTableOsc extends Osc {
-  constructor(freq: Stem, waveTable: number[], freqMultiplier: Stem) {
-    super(freq.mul(freqMultiplier), phase => {
-      const fracIdx = ((phase % TAU) / TAU) * waveTable.length;
-      const idx1 = Math.floor(fracIdx);
-      const idx2 = (idx1 + 1) % waveTable.length;
-      const amt2 = fracIdx - idx1;
-      const amt1 = 1 - amt2;
-      return amt1 * waveTable[idx1] + amt2 * waveTable[idx2];
-    });
+  constructor(freq: Stem, waveTable: number[], freq0: Stem) {
+    super(
+      freq.div(freq0).mul(sampleRate / waveTable.length),
+      phase => {
+        const fracIdx = ((phase % TAU) / TAU) * waveTable.length;
+        const idx1 = Math.floor(fracIdx);
+        const idx2 = (idx1 + 1) % waveTable.length;
+        const amt2 = fracIdx - idx1;
+        const amt1 = 1 - amt2;
+        return amt1 * waveTable[idx1] + amt2 * waveTable[idx2];
+      }
+    );
   }
 }
 
@@ -604,6 +624,10 @@ export function mix(...args: (number | Stem)[]) {
 
 export function mul(...args: (number | Stem)[]) {
   return new Mul(args.map(asStem));
+}
+
+export function div(dividend: number | Stem, divisor: number | Stem) {
+  return new Div(asStem(dividend), asStem(divisor));
 }
 
 // #endregion exports
