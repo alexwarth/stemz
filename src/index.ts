@@ -542,7 +542,7 @@ export function sinen(freq: number | Stem, overtoneCount: number) {
 class WaveTableOsc extends Osc {
   constructor(freq: Stem, waveTable: number[], freq0: Stem) {
     super(
-      freq.div(freq0).mul(sampleRate / waveTable.length),
+      freq.div(freq0),
       phase => {
         const fracIdx = ((phase % TAU) / TAU) * waveTable.length;
         const idx1 = Math.floor(fracIdx);
