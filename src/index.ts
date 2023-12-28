@@ -571,9 +571,9 @@ const waveTables = {
 export function wavetable(
   freq: number | Stem,
   wt: number[],
-  freqMultiplier: number | Stem = 1
+  freq0: number | Stem = 1
 ) {
-  return new WaveTableOsc(asStem(freq), wt, asStem(freqMultiplier));
+  return new WaveTableOsc(asStem(freq), wt, asStem(freq0));
 }
 
 export function wtSine(freq: number | Stem) {
