@@ -537,6 +537,8 @@ export function sinen(freq: number | Stem, overtoneCount: number) {
   return new SineN(asStem(freq), overtoneCount);
 }
 
+// TODO: add parameters to control the start and end points of the portion of the wavetable
+// that is looped over.
 class WaveTableOsc extends Osc {
   constructor(freq: Stem, waveTable: number[], freq0: Stem) {
     super(
